@@ -1,0 +1,8 @@
+CMake Bootstrap
+===============
+
+A set of cmake modules and a build engine for multiplatform development in multiple languages
+
+- Only C is supported for now
+- MacOSX and Linux variants are supported
+
