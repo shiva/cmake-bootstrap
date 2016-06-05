@@ -1,31 +1,23 @@
 cmake_minimum_required(VERSION 2.8)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
-project(FunWithC)
+project(project_name)
 
-#Sends the -std=c99 flag to the gcc compiler
-#add_definitions(-std=c99)
-
+set(CMAKE_ECLIPSE_VERSION 4.5.2)
+include(UseCppUTest)
+add_definitions(-std=c99)
 enable_language(C)
-enable_language(CXX)
-
-# Check for CppUTest and bail out if they don't have it
-if(DEFINED ENV{CPPUTEST_HOME})
-    message("Using CppUTest found in $ENV{CPPUTEST_HOME}")
-    enable_testing()
-else()
-    message("CPPUTEST_HOME is not set; You must tell CMake where to find CppUTest")
-    return()
-endif()
+enable_unit_testing()
 
 # The version number
-set (FunWithC_VERSION_MAJOR 1)
-set (FunWithC_VERSION_MINOR 0)
+set (project_name_VERSION_MAJOR 0)
+set (project_name_VERSION_MINOR 1)
 
 # output directories
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
-# add_subdirectory(project_sources)
+#include_directories(include)
+#add_executable(program_name src/main.c)
 
