@@ -1,6 +1,15 @@
 include(CMakeParseArguments)
 include(CodeCoverage)
 
+function(enable_cpputest)
+    if(defined ENV{CPPUTEST_HOME})
+        message("Using CppUTest found in $ENV{CPPUTEST_HOME}")
+        enable_testing()
+    else()
+        message("Disabling unit-tests. CPPUTEST_HOME is not set; You must tell CMake where to find CppUTest if you want to enable unit-testing.")
+    endif()
+endfunction(add_unit_test)
+
 function(add_unit_test)
     cmake_parse_arguments(ARGS "" "TARGET" "SOURCES" ${ARGN})
 
