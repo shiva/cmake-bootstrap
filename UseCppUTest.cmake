@@ -1,21 +1,21 @@
 include(CMakeParseArguments)
 include(CodeCoverage)
 
-function(enable_cpputest)
-    if(defined ENV{CPPUTEST_HOME})
+function(enable_unit_testing)
+    if(DEFINED ENV{CPPUTEST_HOME})
         message("Using CppUTest found in $ENV{CPPUTEST_HOME}")
         enable_testing()
     else()
         message("Disabling unit-tests. CPPUTEST_HOME is not set; You must tell CMake where to find CppUTest if you want to enable unit-testing.")
     endif()
-endfunction(add_unit_test)
+endfunction(enable_unit_testing)
 
 function(add_unit_test)
     cmake_parse_arguments(ARGS "" "TARGET" "SOURCES" ${ARGN})
 
     # set the target binary and nim cache directory
     set(ut_target "test-${ARGS_TARGET}")
-    
+
     SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     SET(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
@@ -30,8 +30,8 @@ function(add_unit_test)
         EXCLUDE_FROM_ALL
         ${ARGS_SOURCES}
     )
-    
-    target_link_libraries(${ut_target} imp_cpputest) 
+
+    target_link_libraries(${ut_target} imp_cpputest)
     add_custom_target(
         run-${ut_target}
         COMMAND ${ut_target} -v
