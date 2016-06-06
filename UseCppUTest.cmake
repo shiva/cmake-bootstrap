@@ -1,10 +1,10 @@
 include(CMakeParseArguments)
 include(CodeCoverage)
+include(CTest)
 
 function(enable_unit_testing)
     if(DEFINED ENV{CPPUTEST_HOME})
         message("Using CppUTest found in $ENV{CPPUTEST_HOME}")
-        enable_testing()
     else()
         message("Disabling unit-tests. CPPUTEST_HOME is not set; You must tell CMake where to find CppUTest if you want to enable unit-testing.")
     endif()
@@ -30,20 +30,16 @@ function(add_unit_test)
         EXCLUDE_FROM_ALL
         ${ARGS_SOURCES}
     )
-
     target_link_libraries(${ut_target} imp_cpputest)
-    add_custom_target(
-        run-${ut_target}
-        COMMAND ${ut_target} -v
-        DEPENDS ${ut_target}
-        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-        )
+    add_test(
+        NAME ${ut_target}
+        COMMAND $<TARGET_FILE:${ut_target}>
+    )
 
-    if (NOT TARGET unit-test)
-        add_custom_target(unit-test)
+    if (NOT TARGET check)
+        add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
     endif()
-    add_dependencies(unit-test run-${ut_target})
-
+    add_dependencies(check ${ut_target})
 
     SETUP_TARGET_FOR_COVERAGE(cov-${ut_target} ${ut_target} coverage-repot-${ut_target} "-v")
     if (NOT TARGET coverage)
