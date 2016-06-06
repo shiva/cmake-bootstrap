@@ -21,7 +21,7 @@ function(add_unit_test)
     SET(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 
     include_directories($ENV{CPPUTEST_HOME}/include)
-    add_library(imp_cpputest STATIC IMPORTED)
+    add_library(imp_cpputest STATIC IMPORTED GLOBAL)
     set_target_properties(imp_cpputest PROPERTIES
         IMPORTED_LOCATION $ENV{CPPUTEST_HOME}/lib/libCppUTest.a)
 
