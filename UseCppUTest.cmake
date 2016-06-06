@@ -22,8 +22,8 @@ function(add_unit_test)
 
     include_directories($ENV{CPPUTEST_HOME}/include)
     add_library(imp_cpputest STATIC IMPORTED)
-    set_property(TARGET imp_cpputest PROPERTY
-            IMPORTED_LOCATION $ENV{CPPUTEST_HOME}/lib/libCppUTest.a)
+    set_target_properties(imp_cpputest PROPERTIES
+        IMPORTED_LOCATION $ENV{CPPUTEST_HOME}/lib/libCppUTest.a)
 
     add_executable(
         ${ut_target}
