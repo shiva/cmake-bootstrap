@@ -5,6 +5,15 @@ include(CTest)
 function(enable_unit_testing)
     if(DEFINED ENV{CPPUTEST_HOME})
         message("Using CppUTest found in $ENV{CPPUTEST_HOME}")
+        set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+        set(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+        set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
+
+        include_directories($ENV{CPPUTEST_HOME}/include)
+        add_library(imp_cpputest STATIC IMPORTED GLOBAL)
+        set_property(TARGET imp_cpputest PROPERTY
+            IMPORTED_LOCATION $ENV{CPPUTEST_HOME}/lib/libCppUTest.a)
+
     else()
         message("Disabling unit-tests. CPPUTEST_HOME is not set; You must tell CMake where to find CppUTest if you want to enable unit-testing.")
     endif()
@@ -12,18 +21,7 @@ endfunction(enable_unit_testing)
 
 function(add_unit_test)
     cmake_parse_arguments(ARGS "" "TARGET" "SOURCES" ${ARGN})
-
-    # set the target binary and nim cache directory
     set(ut_target "test-${ARGS_TARGET}")
-
-    SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-    SET(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-    SET(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
-
-    include_directories($ENV{CPPUTEST_HOME}/include)
-    add_library(imp_cpputest STATIC IMPORTED GLOBAL)
-    set_property(TARGET imp_cpputest PROPERTY
-        IMPORTED_LOCATION $ENV{CPPUTEST_HOME}/lib/libCppUTest.a)
 
     add_executable(
         ${ut_target}
@@ -31,6 +29,7 @@ function(add_unit_test)
         ${ARGS_SOURCES}
     )
     target_link_libraries(${ut_target} imp_cpputest)
+
     add_test(
         NAME ${ut_target}
         COMMAND $<TARGET_FILE:${ut_target}>
