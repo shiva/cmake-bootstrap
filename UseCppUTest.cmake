@@ -1,27 +1,27 @@
 include(CMakeParseArguments)
 #include(CodeCoverage)
 include(CTest)
+find_package(CppUTest)
 
 function(enable_unit_testing)
-    if(ENABLE_TESTING)
-        find_package(CppUTest)
-        message("Using CppUTest found in ${CPPUTEST_INCLUDE_DIR}")
+	if (NOT ENABLE_TESTING)
+		return()
+	endif()
+	    
+    include_directories(${CPPUTEST_INCLUDE_DIRS})
+    include_directories(${CPPUTEST_EXT_INCLUDE_DIRS})
 
-        include_directories(${CPPUTEST_INCLUDE_DIR})
-        include_directories(${CPPUTEST_EXT_INCLUDE_DIR})
-
-        set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-        set(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
-        set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
-    endif()
+    set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_C_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS="-fprofile-arcs -ftest-coverage")
 endfunction(enable_unit_testing)
 
 function(add_unit_test)
     cmake_parse_arguments(ARGS "" "TARGET" "SOURCES" ${ARGN})
     set(ut_target "test-${ARGS_TARGET}")
 
-    if(NOT ENABLE_TESTING)
-        # skip if testing is not enabled
+    if((NOT ENABLE_TESTING) OR (NOT CPPUTEST_FOUND))
+        # skip if testing is not enabled or cpputest is not found
         message(STATUS "UT disabled. Skipping test target: ${ut_target} ... ")
         return()
     endif()
@@ -31,7 +31,7 @@ function(add_unit_test)
         EXCLUDE_FROM_ALL
         ${ARGS_SOURCES}
     )
-    target_link_libraries(${ut_target} ${CPPUTEST_LIBRARY})
+    target_link_libraries(${ut_target} ${CPPUTEST_LIBRARIES} ${CPPUTEST_EXT_LIBRARIES})
 
     add_test(
         NAME ${ut_target}
