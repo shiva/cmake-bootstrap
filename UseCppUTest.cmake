@@ -6,7 +6,7 @@ if(WITH_TESTS)
 endif()
 
 if(WITH_COVERAGE)
-    include(CodeCoverage)    
+    include(CodeCoverage)
     # Enable code coverage.
     # Build with debugging information to make the output meaningful.
     # Disable optimizations to get the most accurate results.
@@ -24,9 +24,9 @@ function(add_unit_test)
         return()
     endif()
 
-    if(WITH_COVERAGE)   	
+    if(WITH_COVERAGE)
         SETUP_TARGET_FOR_COVERAGE(cov-${ut_target} ${ut_target} coverage-report-${ut_target} "-v")
-        
+
         if (NOT TARGET coverage)
             add_custom_target(coverage)
         endif()
@@ -39,22 +39,16 @@ function(add_unit_test)
     # include paths and setup test target
     include_directories(${CPPUTEST_INCLUDE_DIRS})
     include_directories(${CPPUTEST_EXT_INCLUDE_DIRS})
-    
+
     add_executable(
-        ${ut_target}        
+        ${ut_target}
         ${ARGS_SOURCES}
     )
     target_link_libraries(${ut_target} ${CPPUTEST_LIBRARIES} ${CPPUTEST_EXT_LIBRARIES})
 
-    # add test-executable as a executable test (for ctest)
-    add_test(
-        NAME ${ut_target}
-        COMMAND $<TARGET_FILE:${ut_target}>
-    )
-
     # make check depends on all test targets
     if (NOT TARGET check)
-        add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+        add_custom_target(check COMMAND ${ut_target} -v)
     endif()
     add_dependencies(check ${ut_target})
 
