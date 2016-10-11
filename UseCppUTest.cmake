@@ -15,7 +15,9 @@ if(WITH_COVERAGE)
 endif()
 
 function(add_unit_test)
-    cmake_parse_arguments(ARGS "" "TARGET" "SOURCES" ${ARGN})
+    set(oneValueArgs TARGET)
+    set(multiValueArgs SOURCES LIBRARIES)
+    cmake_parse_arguments(ARGS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     set(ut_target "test-${ARGS_TARGET}")
 
     if(NOT WITH_TESTS)
@@ -25,7 +27,9 @@ function(add_unit_test)
     endif()
 
     if(WITH_COVERAGE)
-        SETUP_TARGET_FOR_COVERAGE(cov-${ut_target} ${ut_target} coverage-report-${ut_target} "-v")
+        SETUP_TARGET_FOR_COVERAGE(
+            cov-${ut_target}
+            ${ut_target} coverage-report-${ut_target} "-v")
 
         if (NOT TARGET coverage)
             add_custom_target(coverage)
@@ -44,7 +48,12 @@ function(add_unit_test)
         ${ut_target}
         ${ARGS_SOURCES}
     )
-    target_link_libraries(${ut_target} ${CPPUTEST_LIBRARIES} ${CPPUTEST_EXT_LIBRARIES})
+    target_link_libraries(
+        ${ut_target}
+        ${CPPUTEST_LIBRARIES}
+        ${CPPUTEST_EXT_LIBRARIES}
+        ${ARGS_LIBRARIES}
+    )
 
     # make check depends on all test targets
     if (NOT TARGET check)
