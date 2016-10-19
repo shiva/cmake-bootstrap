@@ -77,14 +77,13 @@ IF(NOT GCOV_PATH)
 	MESSAGE(FATAL_ERROR "gcov not found! Aborting...")
 ENDIF() # NOT GCOV_PATH
 
-IF(NOT CMAKE_COMPILER_IS_GNUCXX)
-	# Clang version 3.0.0 and greater now supports gcov as well.
-	MESSAGE(WARNING "Compiler is not GNU gcc! Clang Version 3.0.0 and greater supports gcov as well, but older versions don't.")
-
-	IF(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		MESSAGE(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
+IF("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+	IF("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
+		MESSAGE(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
 	ENDIF()
-ENDIF() # NOT CMAKE_COMPILER_IS_GNUCXX
+ELSEIF(NOT CMAKE_COMPILER_IS_GNUCXX)
+	MESSAGE(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
+ENDIF() # CHECK VALID COMPILER
 
 SET(CMAKE_CXX_FLAGS_COVERAGE
     "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
@@ -92,10 +91,10 @@ SET(CMAKE_CXX_FLAGS_COVERAGE
     FORCE )
 SET(CMAKE_C_FLAGS_COVERAGE
     "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
-    CACHE STRING "Flags used by the C compilecabdba2r during coverage builds."
+    CACHE STRING "Flags used by the C compiler during coverage builds."
     FORCE )
 SET(CMAKE_EXE_LINKER_FLAGS_COVERAGE
-    "-lgcov"
+    ""
     CACHE STRING "Flags used for linking binaries during coverage builds."
     FORCE )
 SET(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
@@ -133,7 +132,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 
 	SET(coverage_info "${CMAKE_BINARY_DIR}/${_outputname}.info")
 	SET(coverage_cleaned "${coverage_info}.cleaned")
-  
+
 	SEPARATE_ARGUMENTS(test_command UNIX_COMMAND "${_testrunner}")
 
 	# Setup target
