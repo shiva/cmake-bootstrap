@@ -1,6 +1,8 @@
 include(CMakeParseArguments)
 include(CTest)
 
+set(_CMAKE_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR})
+
 if(WITH_TESTS)
     find_package(CppUTest REQUIRED)
 endif()
@@ -32,7 +34,10 @@ function(add_unit_test)
             ${ut_target} coverage-report-${ut_target} "-v")
 
         if (NOT TARGET coverage)
-            add_custom_target(coverage)
+            add_custom_target(coverage
+                COMMAND ${CMAKE_COMMAND} -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}" -P "${_CMAKE_SCRIPT_PATH}/CoverallsClear.cmake"
+                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+            )
         endif()
         add_dependencies(coverage cov-test-fdb)
     else()
