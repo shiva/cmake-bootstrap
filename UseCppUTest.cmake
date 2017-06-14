@@ -14,6 +14,16 @@ if(WITH_COVERAGE)
     # Disable optimizations to get the most accurate results.
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g -O0")
+
+
+    if (NOT TARGET coverage)
+        SETUP_TARGET_FOR_COVERAGE(
+            coverage
+            ctest
+            coverage-report-fdb)
+    endif()
+else()
+    message(STATUS "COVERAGE disabled. ")
 endif()
 
 function(add_unit_test)
@@ -28,21 +38,21 @@ function(add_unit_test)
         return()
     endif()
 
-    if(WITH_COVERAGE)
-        SETUP_TARGET_FOR_COVERAGE(
-            cov-${ut_target}
-            ${ut_target} coverage-report-${ut_target} "-v")
-
-        if (NOT TARGET coverage)
-            add_custom_target(coverage
-                COMMAND ${CMAKE_COMMAND} -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}" -P "${_CMAKE_SCRIPT_PATH}/CoverallsClear.cmake"
-                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-            )
-        endif()
-        add_dependencies(coverage cov-test-fdb)
-    else()
-        message(STATUS "COVERAGE disabled. ")
-    endif()
+#    if(WITH_COVERAGE)
+#        SETUP_TARGET_FOR_COVERAGE(
+#            cov-${ut_target}
+#            ${ut_target} coverage-report-${ut_target} "-v")
+#
+#        if (NOT TARGET coverage)
+#            add_custom_target(coverage
+#                COMMAND ${CMAKE_COMMAND} -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}" -P "${_CMAKE_SCRIPT_PATH}/CoverallsClear.cmake"
+#                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+#            )
+#        endif()
+#        add_dependencies(coverage cov-${ut_target})
+#    else()
+#        message(STATUS "COVERAGE disabled. ")
+#    endif()
 
 
     # include paths and setup test target
@@ -59,11 +69,11 @@ function(add_unit_test)
         ${CPPUTEST_EXT_LIBRARIES}
         ${ARGS_LIBRARIES}
     )
-
-    # make check depends on all test targets
-    if (NOT TARGET check)
-        add_custom_target(check COMMAND ${ut_target} -v)
-    endif()
-    add_dependencies(check ${ut_target})
+    
+    # also add as a test to ctest
+    add_test(
+        NAME ${ut_target} 
+        COMMAND ${ut_target} -v
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
 endfunction(add_unit_test)
