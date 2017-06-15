@@ -1,13 +1,41 @@
 cmake_minimum_required(VERSION 2.8)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
-
+set(_ECLIPSE_VERSION 4.6)
 project(project_name)
 
-set(CMAKE_ECLIPSE_VERSION 4.5.2)
-include(UseCppUTest)
 add_definitions(-std=c99)
 enable_language(C)
 enable_unit_testing()
+
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
+include(PlatformSpecificSupport)
+include(GenerateCtags)
+
+set(CMAKE_COLOR_MAKEFILE   ON)
+
+option(WITH_COVERAGE "Build with code coverage support (requires lcov and build with tests)." OFF)
+#option(WITH_DOC "Build API documentation (requires Doxygen)." OFF)
+option(WITH_TESTS "Build tests (requires CppUTest)." OFF)
+
+if(WITH_COVERAGE)
+	set(WITH_TESTS ON)
+    include(CodeCoverage)
+    # Enable code coverage.
+    # Build with debugging information to make the output meaningful.
+    # Disable optimizations to get the most accurate results.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g -O0")
+
+    if (NOT TARGET coverage)
+        SETUP_TARGET_FOR_COVERAGE(
+            coverage
+            ctest
+            coverage-report-fdb
+			libdict/*)
+    endif()
+else()
+    message(STATUS "COVERAGE disabled. ")
+endif()
+include(UseCppUTest)
 
 # The version number
 set (project_name_VERSION_MAJOR 0)
@@ -20,4 +48,5 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 #include_directories(include)
 #add_executable(program_name src/main.c)
+
 

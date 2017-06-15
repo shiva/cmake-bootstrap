@@ -118,9 +118,10 @@ ENDIF() # NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
 #						If not, no coverage report will be created!
 # Param _outputname     lcov output is generated as _outputname.info
 #                       HTML report is generated in _outputname/index.html
-# Optional fourth parameter is passed as arguments to _testrunner
+# Param _exclude 		paths to exclude (using a regex)
+# Optional fifth parameter is passed as arguments to _testrunner
 #   Pass them in list form, e.g.: "-j;2" for -j 2
-FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
+FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname _exclude)
 
 	IF(NOT LCOV_PATH)
 		MESSAGE(FATAL_ERROR "lcov not found! Aborting...")
@@ -142,11 +143,11 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _testrunner _outputname)
 		${LCOV_PATH} --directory . --zerocounters
 
 		# Run tests
-		COMMAND ${test_command} ${ARGV3}
+		COMMAND ${test_command} ${ARGV4}
 
 		# Capturing lcov counters and generating report
 		COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info}
-		COMMAND ${LCOV_PATH} --remove ${coverage_info} 'tests/*' '/usr/*' --output-file ${coverage_cleaned}
+		COMMAND ${LCOV_PATH} --remove ${coverage_info} 'tests/*' '/usr/*' '${_exclude}' --output-file ${coverage_cleaned}
 		COMMAND ${GENHTML_PATH} -q -o ${_outputname} ${coverage_cleaned}
 		COMMAND ${CMAKE_COMMAND} -E remove ${coverage_info} ${coverage_cleaned}
 

@@ -7,25 +7,6 @@ if(WITH_TESTS)
     find_package(CppUTest REQUIRED)
 endif()
 
-if(WITH_COVERAGE)
-    include(CodeCoverage)
-    # Enable code coverage.
-    # Build with debugging information to make the output meaningful.
-    # Disable optimizations to get the most accurate results.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g -O0")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -g -O0")
-
-
-    if (NOT TARGET coverage)
-        SETUP_TARGET_FOR_COVERAGE(
-            coverage
-            ctest
-            coverage-report-fdb)
-    endif()
-else()
-    message(STATUS "COVERAGE disabled. ")
-endif()
-
 function(add_unit_test)
     set(oneValueArgs TARGET)
     set(multiValueArgs SOURCES LIBRARIES)
