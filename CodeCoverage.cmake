@@ -72,8 +72,6 @@ function(add_coverage)
 
     separate_arguments(test_command UNIX_COMMAND "${ARGS_TESTRUNNER}")
 
-	message(STATUS "${ARGS_TARGET} ${ARGS_TESTRUNNER} ${ARGS_OUTPUTNAME} ${ARGS_UNPARSED_ARGUMENTS}")
-	message(STATUS "${COVERAGE_INFO} ${COVERAGE_CLEANED}") 
     # Setup target
     add_custom_target(${ARGS_TARGET}
         # Cleanup lcov
@@ -84,7 +82,7 @@ function(add_coverage)
 
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --directory . --capture --output-file ${COVERAGE_INFO}
-        COMMAND ${LCOV_PATH} --remove ${COVERAGE_INFO} 'tests/*' '/usr/*' ${ARGS_EXCLUDE} --output-file ${COVERAGE_CLEANED}
+        COMMAND ${LCOV_PATH} --remove ${COVERAGE_INFO} '/usr/*' ${ARGS_EXCLUDE} --output-file ${COVERAGE_CLEANED}
         COMMAND ${GENHTML_PATH} -q -o ${ARGS_OUTPUTNAME} ${COVERAGE_CLEANED}
         COMMAND ${CMAKE_COMMAND} -E remove ${COVERAGE_INFO} ${COVERAGE_CLEANED}
 
