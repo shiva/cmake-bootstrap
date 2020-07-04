@@ -12,7 +12,9 @@ find_library(CUNIT_LIBRARY NAMES cunit libcunit)
 # handle the QUIETLY and REQUIRED arguments and set CUNIT_FOUND to TRUE if
 # all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
+set(FPHSA_NAME_MISMATCHED 1)
 find_package_handle_standard_args(CUNIT DEFAULT_MSG CUNIT_LIBRARY CUNIT_INCLUDE_DIRS)
+set(FPHSA_NAME_MISMATCHED 0)
 
 if(CUNIT_FOUND)
 	set(CUNIT_LIBRARIES ${CUNIT_LIBRARY})
