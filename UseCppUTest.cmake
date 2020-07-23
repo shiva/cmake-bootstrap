@@ -2,10 +2,7 @@ include(CMakeParseArguments)
 include(CTest)
 
 set(_CMAKE_SCRIPT_PATH ${CMAKE_CURRENT_LIST_DIR})
-
-if(WITH_TESTS)
-    find_package(CppUTest REQUIRED)
-endif()
+find_package(CppUTest REQUIRED)
 
 function(add_unit_test)
     set(oneValueArgs TARGET)
@@ -33,7 +30,7 @@ function(add_unit_test)
         ${CPPUTEST_EXT_LIBRARIES}
         ${ARGS_LIBRARIES}
     )
-    
+
     # also add as a test to ctest
     add_test(
         NAME ${ut_target} 

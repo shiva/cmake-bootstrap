@@ -35,7 +35,18 @@ if(WITH_COVERAGE)
 else()
     message(STATUS "COVERAGE disabled. ")
 endif()
-include(UseCppUTest)
+
+if (WITH_TESTS)
+    include(UseCppUTest)
+else()
+    message(STATUS "TESTS disabled.")
+endif()
+
+if (WITH_DOCS)
+    include(UseDoxygen)
+else()
+    message(STATUS "DOCS disabled.")
+endif()
 
 # The version number
 set (project_name_VERSION_MAJOR 0)
